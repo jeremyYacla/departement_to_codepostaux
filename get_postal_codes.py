@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, jsonify, send_file
 import requests
 import os
 import threading
@@ -9,7 +9,6 @@ app = Flask(__name__)
 def home():
     if request.method == 'POST':
         departements = request.form.get('departements').split(',')
-        filename = 'codes_postaux.txt'
 
         def fetch_data():
             all_codes = []
@@ -26,6 +25,7 @@ def home():
 
             print(f"Total postal codes found: {len(all_codes)}")
 
+            filename = 'codes_postaux.txt'
             # Create the file in the project's root directory
             with open(filename, 'w') as f:
                 for code in all_codes:
@@ -37,7 +37,7 @@ def home():
         # Run the fetch_data function in a new thread
         threading.Thread(target=fetch_data).start()
 
-        return render_template('index.html', message="Data fetching has started.")
+        return jsonify(message="Data fetching has started.")
 
     return render_template('index.html')
 
@@ -48,6 +48,7 @@ def download():
         return send_file(filename, as_attachment=True)
     else:
         return "File not found", 404
+
 if __name__ == '__main__':
     from waitress import serve
     serve(app, host="0.0.0.0", port=5001)
