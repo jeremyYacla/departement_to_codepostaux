@@ -18,7 +18,7 @@ for dep in departements:
 print(f"Total postal codes found: {len(all_codes)}")
 
 # Specifying the directory where to save the file
-output_dir = "C:/Users/Jeremy/Desktop/py"
+output_dir = "<path to directory where to>"
 output_file = os.path.join(output_dir, 'codes_postaux.txt')
 
 with open(output_file, 'w') as f:

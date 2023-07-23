@@ -82,7 +82,7 @@
             const downloadLink = document.getElementById('downloadLink');
 
             // Display "Data fetching has started" message
-            messageElement.textContent = 'Data fetching has started.';
+            messageElement.textContent = 'La récupération des données a commencé.';
 
             // Disable form elements while fetching data
             form.departements.disabled = true;
@@ -107,7 +107,7 @@
                 })
                 .catch(error => {
                     // Display an error message in case of fetch failure
-                    messageElement.textContent = 'Data fetching failed. Please try again later.';
+                    messageElement.textContent = 'La récupération des données a échoué. Veuillez réessayer plus tard.';
                 })
                 .finally(() => {
                     // Enable form elements after fetching is complete
