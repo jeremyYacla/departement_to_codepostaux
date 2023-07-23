@@ -1,121 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Postal Code Fetcher</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
 
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .message {
-            margin-top: 20px;
-        }
-
-        .download-link {
-            display: block;
-            margin-top: 20px;
-            color: #007BFF;
-            text-decoration: none;
-        }
-    </style>
+  <title>Générateur de Codes Postaux</title>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Postal Code Fetcher</h1>
-        <form id="fetchForm">
-            <label for="departements">Enter department codes (comma-separated):</label>
-            <input type="text" id="departements" name="departements" required>
-            <button type="submit">Fetch Data</button>
+  <div class="container py-5">
+    <h2 class="mb-5">Générateur de Codes Postaux</h2>
+
+    <div class="row">
+      <div class="col-6">
+        <form method="POST" id="departements-form">
+          <div class="form-group">
+            <label for="departements">Entrez les codes des départements, séparés par des virgules :</label>
+            <input type="text" id="departements" name="departements" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary">Soumettre</button>
         </form>
-        <div class="message" id="message"></div>
-        <a href="#" class="download-link" id="downloadLink" style="display: none;">Download Postal Codes</a>
+      </div>
+
+      <div class="col-6">
+        <div id="notification" class="alert" role="alert" style="display: none;"></div>
+        <a href="/download" class="btn btn-success" id="download-btn" style="display: none;">Télécharger le fichier généré</a>
+      </div>
     </div>
+  </div>
 
-    <script>
-        document.getElementById('fetchForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const form = event.target;
-            const departements = form.departements.value.trim();
-            const messageElement = document.getElementById('message');
-            const downloadLink = document.getElementById('downloadLink');
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    var checkFileExists = setInterval(function() {
+      $.get("/download", function(data, status) {
+        if (status === 'success') {
+          $('#notification').removeClass('alert-info').addClass('alert-success').text('C\'est GOOOD!').show();
+          $('#download-btn').show();
+          clearInterval(checkFileExists);
+        }
+      });
+    }, 5000);
 
-            // Display "Data fetching has started" message
-            messageElement.textContent = 'Data fetching has started.';
-
-            // Disable form elements while fetching data
-            form.departements.disabled = true;
-            form.querySelector('button').disabled = true;
-
-            // Fetch data using AJAX
-            fetch('/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'departements=' + encodeURIComponent(departements)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    // Display the response message
-                    messageElement.textContent = data;
-
-                    // Show the download link
-                    downloadLink.style.display = 'block';
-                    downloadLink.href = '/download';
-                })
-                .catch(error => {
-                    // Display an error message in case of fetch failure
-                    messageElement.textContent = 'Data fetching failed. Please try again later.';
-                })
-                .finally(() => {
-                    // Enable form elements after fetching is complete
-                    form.departements.disabled = false;
-                    form.querySelector('button').disabled = false;
-                });
-        });
-    </script>
+    $('#departements-form').on('submit', function(e) {
+      e.preventDefault(); // This is to prevent the page from refreshing when the form is submitted.
+      $('#notification').addClass('alert-info').text('Chargement en cours...').show();
+    });
+  </script>
 </body>
 
 </html>
