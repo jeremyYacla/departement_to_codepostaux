@@ -1,29 +1,53 @@
+from flask import Flask, request, render_template, send_file
 import requests
 import os
+import threading
 
-departements = ['01', '02', '03', '08', '10', '14', '21', '22', '25', '27', '35', '39', '42', '43', '44', '50', '51', '52', '53', '54', '55', '57', '59', '60', '62', '63', '67', '68', '70', '71', '74', '76', '80', '88', '89', '90']
+app = Flask(__name__)
 
-all_codes = []
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == 'POST':
+        departements = request.form.get('departements').split(',')
+        filename = 'codes_postaux.txt'
 
-for dep in departements:
-    print(f"Fetching data for department: {dep}")
-    response = requests.get(f"https://geo.api.gouv.fr/departements/{dep}/communes")
-    data = response.json()
-    for commune in data:
-        if 'codesPostaux' in commune:
-            all_codes.extend(commune['codesPostaux'])
-        else:
-            print(f"No postal codes found for commune: {commune['nom']}")
+        def fetch_data():
+            all_codes = []
 
-print(f"Total postal codes found: {len(all_codes)}")
+            for dep in departements:
+                print(f"Fetching data for department: {dep}")
+                response = requests.get(f"https://geo.api.gouv.fr/departements/{dep}/communes")
+                data = response.json()
+                for commune in data:
+                    if 'codesPostaux' in commune:
+                        all_codes.extend(commune['codesPostaux'])
+                    else:
+                        print(f"No postal codes found for commune: {commune['nom']}")
 
-# Specifying the directory where to save the file
-output_dir = "C:/Users/Jeremy/Desktop/py"
-output_file = os.path.join(output_dir, 'codes_postaux.txt')
+            print(f"Total postal codes found: {len(all_codes)}")
 
-with open(output_file, 'w') as f:
-    for code in all_codes:
-        f.write(code + "\n")
+            # Create the file in the project's root directory
+            with open(filename, 'w') as f:
+                for code in all_codes:
+                    f.write(code + "\n")
 
-print(f"Postal codes have been written to {output_file}")
-print("Voila bg!")
+            print(f"Postal codes have been written to {filename}")
+            print("Voila bg!")
+
+        # Run the fetch_data function in a new thread
+        threading.Thread(target=fetch_data).start()
+
+        return render_template('index.html', message="Data fetching has started.")
+
+    return render_template('index.html')
+
+@app.route('/download', methods=['GET'])
+def download():
+    filename = 'codes_postaux.txt'
+    if os.path.exists(filename):
+        return send_file(filename, as_attachment=True)
+    else:
+        return "File not found", 404
+
+if __name__ == '__main__':
+    app.run()
