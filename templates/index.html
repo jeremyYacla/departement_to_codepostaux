@@ -73,49 +73,49 @@
         <a href="#" class="download-link" id="downloadLink" style="display: none;">Download Postal Codes</a>
     </div>
 
-    <script>
-        document.getElementById('fetchForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const form = event.target;
-            const departements = form.departements.value.trim();
-            const messageElement = document.getElementById('message');
-            const downloadLink = document.getElementById('downloadLink');
+  <script>
+      document.getElementById('fetchForm').addEventListener('submit', function (event) {
+          event.preventDefault();
+          const form = event.target;
+          const departements = form.departements.value.trim();
+          const messageElement = document.getElementById('message');
+          const downloadLink = document.getElementById('downloadLink');
 
-            // Display "Data fetching has started" message
-            messageElement.textContent = 'La récupération des données a commencé.';
+          // Display "Data fetching has started" message
+          messageElement.textContent = 'La récupération des données a commencé.';
 
-            // Disable form elements while fetching data
-            form.departements.disabled = true;
-            form.querySelector('button').disabled = true;
+          // Disable form elements while fetching data
+          form.departements.disabled = true;
+          form.querySelector('button').disabled = true;
 
-            // Fetch data using AJAX
-            fetch('/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'departements=' + encodeURIComponent(departements)
-            })
-                .then(response => response.text())
-                .then(data => {
-                    // Display the response message
-                    messageElement.textContent = data;
+          // Fetch data using AJAX
+          fetch('/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: 'departements=' + encodeURIComponent(departements)
+          })
+              .then(response => response.json())
+              .then(data => {
+                  // Display the response message
+                  messageElement.textContent = data.message;
 
-                    // Show the download link
-                    downloadLink.style.display = 'block';
-                    downloadLink.href = '/download';
-                })
-                .catch(error => {
-                    // Display an error message in case of fetch failure
-                    messageElement.textContent = 'La récupération des données a échoué. Veuillez réessayer plus tard.';
-                })
-                .finally(() => {
-                    // Enable form elements after fetching is complete
-                    form.departements.disabled = false;
-                    form.querySelector('button').disabled = false;
-                });
-        });
-    </script>
+                  // Show the download link
+                  downloadLink.style.display = 'block';
+                  downloadLink.href = '/download';
+              })
+              .catch(error => {
+                  // Display an error message in case of fetch failure
+                  messageElement.textContent = 'La récupération des données a échoué. Veuillez réessayer plus tard.';
+              })
+              .finally(() => {
+                  // Enable form elements after fetching is complete
+                  form.departements.disabled = false;
+                  form.querySelector('button').disabled = false;
+              });
+      });
+  </script>
 </body>
 
 </html>
