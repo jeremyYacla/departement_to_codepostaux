@@ -50,11 +50,11 @@
             fetch('https://api.giphy.com/v1/gifs/random?api_key=BuxruN4kPHEnrOCPVOL6AhepGEcXNIu4')
     .then(response => response.json())
     .then(data => {
-        console.log(data);  // Ajoutez cette ligne
-        loadingGif.src = data.data.image_url;
+        loadingGif.src = data.data.images.original.url;  // Changez cette ligne
         loadingGif.style.display = 'block';
         messageElement.style.display = 'none';
     });
+
 
 
             fetch('/', {
