@@ -25,6 +25,7 @@
                             <button type="submit" class="btn btn-primary">Fetch Data</button>
                         </form>
                         <div class="message mt-3" id="message"></div>
+                        <img id="loadingGif" src="" style="display: none;">
                         <a href="#" class="download-link" id="downloadLink" style="display: none;">Download Postal Codes</a>
                     </div>
                 </div>
@@ -40,12 +41,19 @@
             const form = event.target;
             const departements = form.departements.value.trim();
             const messageElement = document.getElementById('message');
+            const loadingGif = document.getElementById('loadingGif');
             const downloadLink = document.getElementById('downloadLink');
-
-            messageElement.textContent = 'La récupération des données a commencé.';
 
             form.departements.disabled = true;
             form.querySelector('button').disabled = true;
+
+            fetch('https://api.giphy.com/v1/gifs/random?api_key=PhQdSvO9520MrMcx5ZFFdddWnGjzeRZA')
+                .then(response => response.json())
+                .then(data => {
+                    loadingGif.src = data.data.image_url;
+                    loadingGif.style.display = 'block';
+                    messageElement.style.display = 'none';
+                });
 
             fetch('/', {
                 method: 'POST',
@@ -56,12 +64,16 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    loadingGif.style.display = 'none';
                     messageElement.textContent = data.message;
+                    messageElement.style.display = 'block';
                     downloadLink.style.display = 'block';
                     downloadLink.href = '/download';
                 })
                 .catch(error => {
+                    loadingGif.style.display = 'none';
                     messageElement.textContent = 'La récupération des données a échoué. Veuillez réessayer plus tard.';
+                    messageElement.style.display = 'block';
                 })
                 .finally(() => {
                     form.departements.disabled = false;
