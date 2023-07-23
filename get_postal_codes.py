@@ -48,7 +48,6 @@ def download():
         return send_file(filename, as_attachment=True)
     else:
         return "File not found", 404
-
 if __name__ == '__main__':
     from waitress import serve
     serve(app, host="0.0.0.0", port=5001)
