@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    message = ''
     if request.method == 'POST':
         departements = request.form.get('departements').split(',')
 
@@ -37,9 +38,9 @@ def home():
         # Run the fetch_data function in a new thread
         threading.Thread(target=fetch_data).start()
 
-        return jsonify(message="Data fetching has started.")
+        message = "La récupération des données a commencé."
 
-    return render_template('index.html')
+    return render_template('index.html', message=message)
 
 @app.route('/download', methods=['GET'])
 def download():
