@@ -51,4 +51,6 @@ def download():
 
 if __name__ == '__main__':
     from waitress import serve
-    serve(app, host="0.0.0.0", port=5001)
+    port = int(os.getenv('PORT', 5001))  # get port from environment variable PORT if it exists, otherwise use 5001
+    serve(app, host="0.0.0.0", port=port)
+
