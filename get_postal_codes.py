@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_file, render_template
 import requests
 import os
 import threading
+import time  # 1. Importez le module time
 
 app = Flask(__name__)
 
@@ -23,10 +24,11 @@ def home():
                     else:
                         print(f"No postal codes found for commune: {commune['nom']}")
 
+                time.sleep(30)  # 2. Ajoutez un délai de 30 secondes
+
             print(f"Total postal codes found: {len(all_codes)}")
 
             filename = 'codes_postaux.txt'
-            # Create the file in the project's root directory
             with open(filename, 'w') as f:
                 for code in all_codes:
                     f.write(code + "\n")
@@ -34,7 +36,6 @@ def home():
             print(f"Postal codes have been written to {filename}")
             print("Voila bg!")
 
-        # Run the fetch_data function in a new thread
         threading.Thread(target=fetch_data).start()
 
         return jsonify(message="Data fetching has started.")
