@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_file, render_template
 import requests
 import os
 import threading
-import time  # 1. Importez le module time
+import uuid
 
 app = Flask(__name__)
 
@@ -11,9 +11,11 @@ def home():
     if request.method == 'POST':
         departements = request.form.get('departements').split(',')
 
+        unique_id = uuid.uuid4()
+        filename = f'codes_postaux_{unique_id}.txt'
+
         def fetch_data():
             all_codes = []
-
             for dep in departements:
                 print(f"Fetching data for department: {dep}")
                 response = requests.get(f"https://geo.api.gouv.fr/departements/{dep}/communes")
@@ -24,11 +26,9 @@ def home():
                     else:
                         print(f"No postal codes found for commune: {commune['nom']}")
 
-                time.sleep(30)  # 2. Ajoutez un délai de 30 secondes
-
             print(f"Total postal codes found: {len(all_codes)}")
 
-            filename = 'codes_postaux.txt'
+            # Create the file with the unique filename
             with open(filename, 'w') as f:
                 for code in all_codes:
                     f.write(code + "\n")
@@ -36,17 +36,18 @@ def home():
             print(f"Postal codes have been written to {filename}")
             print("Voila bg!")
 
+        # Run the fetch_data function in a new thread
         threading.Thread(target=fetch_data).start()
 
-        return jsonify(message="Data fetching has started.")
+        return jsonify(message="Data fetching has started.", unique_id=str(unique_id))
 
     return render_template('index.html')
 
-@app.route('/download', methods=['GET'])
-def download():
-    filename = 'codes_postaux.txt'
+@app.route('/download/<unique_id>', methods=['GET'])
+def download(unique_id):
+    filename = f'codes_postaux_{unique_id}.txt'
     if os.path.exists(filename):
-        return send_file(filename, as_attachment=True)
+        return send_file(filename, as_attachment=True, download_name='codes_postaux.txt')
     else:
         return "File not found", 404
 
